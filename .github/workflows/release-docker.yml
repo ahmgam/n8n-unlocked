@@ -33,8 +33,13 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git clone --branch ${{ github.event.inputs.version }} --depth=1 https://github.com/n8n-io/n8n.git
+      - name: Apply patch
+        run: |          
           cd n8n
           git apply ${{ github.workspace }}/unlock-patch/license-stub.patch
+      - name: Check status
+        run: |  
+          cd n8n 
           git status
 
       - name: Set up Docker Buildx
