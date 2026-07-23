@@ -21,10 +21,11 @@ jobs:
       - name: Check upstream version and whether we already have it
         id: check
         run: |
-          # Fetch upstream package.json
+          # Fetch latest upstream release from GitHub API
+          release_json=$(curl -fsSL "https://api.github.com/repos/n8n-io/n8n/releases/latest")
+          tag=$(echo "$release_json" | grep '"tag_name"' | head -1 | awk -F: '{print $2}' | sed 's/[", ]//g')
+          # Also fetch package.json for packageManager
           pkg_json=$(curl -fsSL "https://raw.githubusercontent.com/n8n-io/n8n/refs/heads/master/package.json")
-          upstream_ver=$(echo "$pkg_json" | grep '"version"' | head -1 | awk -F: '{print $2}' | sed 's/[", ]//g')
-          tag="v${upstream_ver}"
           pkg_mgr=$(echo "$pkg_json" | grep '"packageManager"' | head -1 | awk -F: '{print $2}' | sed 's/[", ]//g')
           echo "upstream_tag=${tag}" >> $GITHUB_OUTPUT
           echo "package_manager=${pkg_mgr}" >> $GITHUB_OUTPUT
