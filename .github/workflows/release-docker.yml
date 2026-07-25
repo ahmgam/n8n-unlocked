@@ -81,4 +81,4 @@ jobs:
             N8N_VERSION=${{ steps.clean-version.outputs.version }}
             N8N_RELEASE_TYPE=stable
           push: true
-          tags: ${{ steps.clean-version.outputs.version }}
+          tags: ahmgam/n8n:${{ steps.clean-version.outputs.version }}
