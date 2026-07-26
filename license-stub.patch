@@ -1,6 +1,6 @@
 diff --git a/packages/@n8n/license-stub/package.json b/packages/@n8n/license-stub/package.json
 new file mode 100644
-index 0000000000..447037e634
+index 0000000000..3b327476c9
 --- /dev/null
 +++ b/packages/@n8n/license-stub/package.json
 @@ -0,0 +1,10 @@
@@ -9,28 +9,17 @@ index 0000000000..447037e634
 +	"version": "3.0.0",
 +	"description": "Stub replacement for @n8n_io/license-sdk ΓÇö returns all features as licensed",
 +	"type": "module",
-+	"main": "src/index.ts",
-+	"types": "src/index.ts",
++	"main": "src/index.js",
++	"types": "src/index.d.ts",
 +	"private": true,
 +	"license": "SEE LICENSE IN LICENSE.md"
 +}
-diff --git a/packages/@n8n/license-stub/src/index.ts b/packages/@n8n/license-stub/src/index.ts
+diff --git a/packages/@n8n/license-stub/src/index.d.ts b/packages/@n8n/license-stub/src/index.d.ts
 new file mode 100644
-index 0000000000..01158a0ca5
+index 0000000000..b13e612d49
 --- /dev/null
-+++ b/packages/@n8n/license-stub/src/index.ts
-@@ -0,0 +1,184 @@
-+/**
-+ * Stub implementation of @n8n_io/license-sdk.
-+ *
-+ * Returns all features as licensed and all quotas as unlimited.
-+ * Drop-in replacement ΓÇö same exports, same API surface, no real license validation.
-+ */
-+
-+// ---------------------------------------------------------------------------
-+// Types ΓÇö matching the real SDK's public type exports
-+// ---------------------------------------------------------------------------
-+
++++ b/packages/@n8n/license-stub/src/index.d.ts
+@@ -0,0 +1,87 @@
 +export type TLicenseBlock = string;
 +
 +export type TEntitlement = {
@@ -47,7 +36,12 @@ index 0000000000..01158a0ca5
 +type TUsageMetric = { name: string; value: number };
 +type TPassthroughData = Record<string, unknown>;
 +type TFeatures = Record<string, boolean | number | string>;
-+type TLogger = { error: (...args: unknown[]) => void; warn: (...args: unknown[]) => void; info: (...args: unknown[]) => void; debug: (...args: unknown[]) => void };
++type TLogger = {
++	error: (...args: unknown[]) => void;
++	warn: (...args: unknown[]) => void;
++	info: (...args: unknown[]) => void;
++	debug: (...args: unknown[]) => void;
++};
 +
 +type TLicenseManagerConfig = {
 +	server?: string;
@@ -70,139 +64,175 @@ index 0000000000..01158a0ca5
 +	logger?: TLogger;
 +};
 +
-+// ---------------------------------------------------------------------------
-+// Stub LicenseManager
-+// ---------------------------------------------------------------------------
-+
-+export class LicenseManager {
++export declare class LicenseManager {
 +	config: TLicenseManagerConfig;
 +
-+	constructor(config: TLicenseManagerConfig) {
-+		this.config = config;
-+	}
++	constructor(config: TLicenseManagerConfig);
 +
-+	// -- lifecycle -----------------------------------------------------------
++	initialize(): Promise<void>;
++	activate(
++		reservationId: string,
++		options?: { eulaUri?: string; email?: string },
++	): Promise<void>;
++	renew(): Promise<void>;
++	reload(): Promise<void>;
++	clear(): Promise<void>;
++	shutdown(): Promise<void>;
++	reset(): Promise<void>;
 +
-+	async initialize(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] initialize() ΓÇö stub, skipping');
-+	}
-+
-+	async activate(
-+		_reservationId: string,
-+		_options?: { eulaUri?: string; email?: string },
-+	): Promise<void> {
-+		this.config.logger?.debug('[license-stub] activate() ΓÇö returning early (stub)');
-+	}
-+
-+	async renew(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] renew() ΓÇö stub, no-op');
-+	}
-+
-+	async reload(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] reload() ΓÇö stub, no-op');
-+	}
-+
-+	async clear(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] clear() ΓÇö stub, no-op');
-+	}
-+
-+	async shutdown(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] shutdown() ΓÇö stub, no-op');
-+	}
-+
-+	async reset(): Promise<void> {
-+		this.config.logger?.debug('[license-stub] reset() ΓÇö stub, no-op');
-+	}
-+
-+	// -- queries ------------------------------------------------------------
-+
-+	isValid(_useLogger?: boolean): boolean {
-+		return true;
-+	}
-+
-+	hasFeatureEnabled(_feature: string, _requireValidCert?: boolean): boolean {
-+		return true;
-+	}
-+
-+	hasFeatureDefined(_feature: string, _requireValidCert?: boolean): boolean {
-+		return true;
-+	}
-+
-+	hasQuotaLeft(_quotaFeatureName: string, _currentConsumption: number): boolean {
-+		return true;
-+	}
-+
++	isValid(useLogger?: boolean): boolean;
++	hasFeatureEnabled(feature: string, requireValidCert?: boolean): boolean;
++	hasFeatureDefined(feature: string, requireValidCert?: boolean): boolean;
++	hasQuotaLeft(quotaFeatureName: string, currentConsumption: number): boolean;
 +	getFeatureValue(
 +		feature: string,
-+		_requireValidCert?: boolean,
-+	): undefined | boolean | number | string {
-+		if (feature === 'planName') return 'Enterprise';
-+		return 999999;
-+	}
++		requireValidCert?: boolean,
++	): undefined | boolean | number | string;
++	getFeatures(): TFeatures;
++	getCurrentEntitlements(): TEntitlement[];
++	getManagementJwt(): string;
++	getCertStr(): Promise<TLicenseBlock>;
++	getConsumerId(): string | undefined;
++	getExpiryDate(): Date;
++	getTerminationDate(): Date;
++	isTerminated(): boolean;
++	isRenewalDue(): boolean;
++	toString(): string;
 +
-+	getFeatures(): TFeatures {
-+		return {};
-+	}
++	enableAutoRenewals(): void;
++	disableAutoRenewals(): void;
 +
-+	getCurrentEntitlements(): TEntitlement[] {
-+		return [];
-+	}
++	computeDeviceFingerprint(): Promise<string>;
++	log(msg: string, logLevel: string): void;
 +
-+	getManagementJwt(): string {
-+		return '';
-+	}
++	readonly isInitialized: boolean;
++}
+diff --git a/packages/@n8n/license-stub/src/index.js b/packages/@n8n/license-stub/src/index.js
+new file mode 100644
+index 0000000000..f145b2a53f
+--- /dev/null
++++ b/packages/@n8n/license-stub/src/index.js
+@@ -0,0 +1,121 @@
++/**
++ * Stub implementation of @n8n_io/license-sdk.
++ *
++ * Returns all features as licensed and all quotas as unlimited.
++ * Drop-in replacement ΓÇö same exports, same API surface, no real license validation.
++ */
 +
-+	async getCertStr(): Promise<TLicenseBlock> {
-+		return '';
-+	}
++export class LicenseManager {
++  constructor(config) {
++    this.config = config;
++  }
 +
-+	getConsumerId(): string | undefined {
-+		return 'license-stub-consumer';
-+	}
++  async initialize() {
++    this.config.logger?.debug('[license-stub] initialize() \u2014 stub, skipping');
++  }
 +
-+	getExpiryDate(): Date {
-+		return new Date('2099-12-31');
-+	}
++  async activate(_reservationId, _options) {
++    this.config.logger?.debug('[license-stub] activate() \u2014 returning early (stub)');
++  }
 +
-+	getTerminationDate(): Date {
-+		return new Date('2099-12-31');
-+	}
++  async renew() {
++    this.config.logger?.debug('[license-stub] renew() \u2014 stub, no-op');
++  }
 +
-+	isTerminated(): boolean {
-+		return false;
-+	}
++  async reload() {
++    this.config.logger?.debug('[license-stub] reload() \u2014 stub, no-op');
++  }
 +
-+	isRenewalDue(): boolean {
-+		return false;
-+	}
++  async clear() {
++    this.config.logger?.debug('[license-stub] clear() \u2014 stub, no-op');
++  }
 +
-+	toString(): string {
-+		return 'LicenseManager (stub ΓÇö all features enabled)';
-+	}
++  async shutdown() {
++    this.config.logger?.debug('[license-stub] shutdown() \u2014 stub, no-op');
++  }
 +
-+	// -- auto-renewal -------------------------------------------------------
++  async reset() {
++    this.config.logger?.debug('[license-stub] reset() \u2014 stub, no-op');
++  }
 +
-+	enableAutoRenewals(): void {
-+		this.config.logger?.debug('[license-stub] enableAutoRenewals() ΓÇö stub, no-op');
-+	}
++  isValid(_useLogger) {
++    return true;
++  }
 +
-+	disableAutoRenewals(): void {
-+		this.config.logger?.debug('[license-stub] disableAutoRenewals() ΓÇö stub, no-op');
-+	}
++  hasFeatureEnabled(_feature, _requireValidCert) {
++    return true;
++  }
 +
-+	// -- utilities ----------------------------------------------------------
++  hasFeatureDefined(_feature, _requireValidCert) {
++    return true;
++  }
 +
-+	async computeDeviceFingerprint(): Promise<string> {
-+		return 'license-stub-fingerprint';
-+	}
++  hasQuotaLeft(_quotaFeatureName, _currentConsumption) {
++    return true;
++  }
 +
-+	log(msg: string, _logLevel: string): void {
-+		this.config.logger?.debug(`[license-stub] ${msg}`);
-+	}
++  getFeatureValue(feature, _requireValidCert) {
++    if (feature === 'planName') return 'Enterprise';
++    return 999999;
++  }
 +
-+	get isInitialized(): boolean {
-+		return true;
-+	}
++  getFeatures() {
++    return {};
++  }
++
++  getCurrentEntitlements() {
++    return [];
++  }
++
++  getManagementJwt() {
++    return '';
++  }
++
++  async getCertStr() {
++    return '';
++  }
++
++  getConsumerId() {
++    return 'license-stub-consumer';
++  }
++
++  getExpiryDate() {
++    return new Date('2099-12-31');
++  }
++
++  getTerminationDate() {
++    return new Date('2099-12-31');
++  }
++
++  isTerminated() {
++    return false;
++  }
++
++  isRenewalDue() {
++    return false;
++  }
++
++  toString() {
++    return 'LicenseManager (stub \u2014 all features enabled)';
++  }
++
++  enableAutoRenewals() {
++    this.config.logger?.debug('[license-stub] enableAutoRenewals() \u2014 stub, no-op');
++  }
++
++  disableAutoRenewals() {
++    this.config.logger?.debug('[license-stub] disableAutoRenewals() \u2014 stub, no-op');
++  }
++
++  async computeDeviceFingerprint() {
++    return 'license-stub-fingerprint';
++  }
++
++  log(msg, _logLevel) {
++    this.config.logger?.debug(`[license-stub] ${msg}`);
++  }
++
++  get isInitialized() {
++    return true;
++  }
 +}
 diff --git a/packages/cli/package.json b/packages/cli/package.json
 index 0bd7981b7d..5232313089 100644
@@ -295,3 +325,4 @@ index 11c7aa15f8..f658281332 100644
    node-readfiles@0.2.0:
      dependencies:
        es6-promise: 3.3.1
+
