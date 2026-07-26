@@ -109,7 +109,7 @@ index 0000000000..b13e612d49
 +}
 diff --git a/packages/@n8n/license-stub/src/index.js b/packages/@n8n/license-stub/src/index.js
 new file mode 100644
-index 0000000000..f145b2a53f
+index 0000000000..37b31ee369
 --- /dev/null
 +++ b/packages/@n8n/license-stub/src/index.js
 @@ -0,0 +1,121 @@
@@ -171,7 +171,7 @@ index 0000000000..f145b2a53f
 +
 +  getFeatureValue(feature, _requireValidCert) {
 +    if (feature === 'planName') return 'Enterprise';
-+    return 999999;
++    return -1;
 +  }
 +
 +  getFeatures() {
@@ -325,4 +325,3 @@ index 11c7aa15f8..f658281332 100644
    node-readfiles@0.2.0:
      dependencies:
        es6-promise: 3.3.1
-
